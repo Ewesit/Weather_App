@@ -1,3 +1,5 @@
+let isMetric = true; // Default to Celsius
+
 async function getWeather() {
     const apiKey = 'f2bc08aa512e122c1da8494d5d01cf68';
     const city = document.getElementById('city').value;
@@ -7,6 +9,7 @@ async function getWeather() {
         return;
     }
 
+    const units = isMetric ? 'metric' : 'imperial';
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
     // try {
@@ -26,7 +29,7 @@ async function getWeather() {
     try {
         // Show loading indicator
         document.getElementById('loadingIndicator').style.display = 'block';
-        
+
         const response = await fetch(apiUrl);
 
         if (!response.ok) {
@@ -50,6 +53,9 @@ async function getWeather() {
 }
 
 function displayWeather(data) {
+    const temperature = isMetric ? data.main.temp : (data.main.temp * 9/5 + 32).toFixed(2);
+    const temperatureUnit = isMetric ? '°C' : '°F';
+
     const weatherInfoElement = document.getElementById('weatherInfo');
     weatherInfoElement.innerHTML = `
         <h2>${data.name}</h2>
@@ -57,4 +63,9 @@ function displayWeather(data) {
         <p>Description: ${data.weather[0].description}</p>
         <img src="http://openweathermap.org/img/w/${data.weather[0].icon}.png" alt="Weather Icon">
     `;
+}
+
+function toggleUnits() {
+    isMetric = !isMetric;
+    getWeather(); // Re-fetch weather data with the new unit
 }
